@@ -1,0 +1,8 @@
+export default {
+  QQ_CLIENT_ID: '',
+  QQ_REDIRECT_URL: '',
+  GITEE_CLIENT_ID: '',
+  GITEE_REDIRECT_URL: '',
+  WEIBO_CLIENT_ID: '',
+  WEIBO_REDIRECT_URL: '',
+};
