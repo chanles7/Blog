@@ -31,7 +31,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @RequestMapping(value = "/list",method = RequestMethod.GET)
-    @SaCheckLogin
+//    @SaCheckLogin
     @ApiOperation(value = "分类列表", httpMethod = "GET", response = ResponseResult.class, notes = "分类列表")
     public ResponseResult list(String name){
         return categoryService.listCategory(name);

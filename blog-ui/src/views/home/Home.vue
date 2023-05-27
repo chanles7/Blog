@@ -388,6 +388,7 @@ export default {
     getBlogList() {
       let md = require("markdown-it")();
       fetchList(this.params).then((res) => {
+        this.articleList = []
         if (res.data.records.length) {
           // 去除markdown标签
           res.data.records.forEach((item) => {

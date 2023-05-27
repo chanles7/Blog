@@ -1,107 +1,135 @@
 <template>
   <div>
-
-
     <v-row class="blog-container">
-
-
-    </v-row>
-
-
-    <!-- 主页文章 -->
-    <v-row class="home-container">
-      <!-- 博主信息 -->
-      <v-col :md="12" :cols="12" class="d-md-block d-none">
-        <div class="blog-wrapper">
-          <v-card class="animated zoomIn blog-card mt-5">
-            <div class="author-wrapper">
-              <!-- 博主头像 -->
-              <v-avatar size="110">
-                <img class="author-avatar" :src="blogInfo.webSite.authorAvatar" />
-              </v-avatar>
-              <div style="font-size: 1.375rem">
-                {{ blogInfo.webSite.author }}
-              </div>
-              <div style="font-size: 0.875rem;">
-                {{ blogInfo.webSite.authorInfo }}
-              </div>
+      <v-col :md="3" :cols="12">
+        <v-card class="blog-sider">
+          <v-card class="blog-sider-function">
+            <div>
+              <router-link to="/">
+                <span>首页</span>
+              </router-link>
             </div>
-            <!-- 博客信息 -->
-            <div class="blog-info-wrapper">
-              <div class="blog-info-data">
-                <router-link to="/archives">
-                  <div style="font-size: 0.875rem">文章</div>
-                  <div style="font-size: 1.25rem">
-                    {{ blogInfo.count.articleCount }}
-                  </div>
-                </router-link>
-              </div>
-              <div class="blog-info-data">
-                <router-link to="/categories">
-                  <div style="font-size: 0.875rem">分类</div>
-                  <div style="font-size: 1.25rem">
-                    {{ blogInfo.count.categoryCount }}
-                  </div>
-                </router-link>
-              </div>
-              <div class="blog-info-data">
-                <router-link to="/tags">
-                  <div style="font-size: 0.875rem">标签</div>
-                  <div style="font-size: 1.25rem"> {{ blogInfo.count.tagCount }}</div>
-                </router-link>
-              </div>
+            <div style="padding:50px 0">
+              <span @click="handleAdd">新博客</span>
             </div>
           </v-card>
-        </div>
+          <v-card style="height:calc(100% - 500px)">
+            <el-calendar />
+          </v-card>
+        </v-card>
       </v-col>
 
-      <v-col :md="12" :cols="12">
-        <v-card class="animated zoomIn article-card" style="border-radius: 12px 8px 8px 12px" v-for="(item, index) of articleList" :key="item.id">
-          <!-- 文章信息 -->
-          <div class="article-wrapper">
-            <div style="line-height:1.">
-              <div>
-                <router-link :to="'/articles/' + item.id">
-                  {{ item.title }}
-                </router-link>
-                <span v-if="item.quantity >= 1000 && item.quantity < 10000" style="font-size:12px;border-radius:3px;border: 1px solid  #f70;text-align: center">
-                  <font style="color: #f70;">千次阅读</font>
-                </span>
-                <span v-if="item.quantity >= 10000" style="font-size:12px;border-radius:3px;border: 1px solid  #f70;text-align: center">
-                  <font style="color: #f70;">万次阅读</font>
-                </span>
-              </div>
-            </div>
-            <div class="article-info">
-              <!-- 是否置顶 -->
-              <span v-if="item.isStick === 1">
-                <span style="color:#ff7242">
-                  <i class="iconfont iconzhiding" /> 置顶
-                </span>
-                <span class="separator">|</span>
-              </span>
-              <!-- 发表时间 -->
-              <v-icon size="14">mdi-calendar-month-outline</v-icon>
-              {{ item.createTime | date }}
-              <span class="separator">|</span>
-              <!-- 文章分类 -->
-              <router-link :to="'/categories/' + item.categoryId">
-                <v-icon size="14">mdi-inbox-full</v-icon>
-                {{ item.categoryName }}
-              </router-link>
-              <span class="separator">|</span>
-              <!-- 文章标签 -->
-              <router-link style="display:inline-block" :to="'/tags/' + tag.id" class="mr-1" v-for="tag of item.tagDTOList" :key="tag.id">
-                <v-icon size="14">mdi-tag-multiple</v-icon>
-                {{ tag.name }}
-              </router-link>
-            </div>
-            <!-- 文章内容 -->
-            <div class="article-content">
-              {{ item.content }}
-            </div>
-          </div>
-        </v-card>
+      <v-col :md="9" :cols="12">
+        <div>
+          <v-row class="home-container">
+            <!-- 博主信息 -->
+            <v-col :md="12" :cols="12" class="d-md-block d-none">
+              <v-card class="blog-wrapper">
+                <v-row>
+                  <v-col :md="2" :cols="12">
+                    <div class="author-wrapper">
+                      <!-- 博主头像 -->
+                      <v-avatar size="110">
+                        <img class="author-avatar" :src="blogInfo.webSite.authorAvatar" />
+                      </v-avatar>
+                    </div>
+                  </v-col>
+                  <v-col :md="10" :cols="12" style="margin-top:240px">
+                    <div style="font-size: 1.375rem">
+                      {{ blogInfo.webSite.author }}
+                    </div>
+                    <div style="font-size: 0.875rem;">
+                      {{ blogInfo.webSite.authorInfo }}
+                    </div>
+                    <!-- 博客信息 -->
+                    <div class="blog-info-wrapper">
+                      <div class="blog-info-data">
+                        <router-link to="/archives">
+                          <div style="font-size: 0.875rem">文章</div>
+                          <div style="font-size: 1.25rem">
+                            {{ blogInfo.count.articleCount }}
+                          </div>
+                        </router-link>
+                      </div>
+                      <div class="blog-info-data">
+                        <router-link to="/categories">
+                          <div style="font-size: 0.875rem">分类</div>
+                          <div style="font-size: 1.25rem">
+                            {{ blogInfo.count.categoryCount }}
+                          </div>
+                        </router-link>
+                      </div>
+                      <div class="blog-info-data">
+                        <router-link to="/tags">
+                          <div style="font-size: 0.875rem">标签</div>
+                          <div style="font-size: 1.25rem"> {{ blogInfo.count.tagCount }}</div>
+                        </router-link>
+                      </div>
+                    </div>
+                  </v-col>
+                </v-row>
+              </v-card>
+            </v-col>
+
+            <v-col :md="12" :cols="12">
+              <v-card v-for="(item, index) of articleList" :key="item.id" class="article-card" style="border-radius: 12px 8px 8px 12px;">
+                <div style="height:240px;">
+                  <!-- 文章信息 -->
+                  <div class="article-wrapper">
+                    <div style="line-height:1.">
+                      <div>
+                        <router-link :to="'/articles/' + item.id">
+                          {{ item.title }}
+                        </router-link>
+                        <span v-if="item.quantity >= 1000 && item.quantity < 10000" style="font-size:12px;border-radius:3px;border: 1px solid  #f70;text-align: center">
+                          <font style="color: #f70;">千次阅读</font>
+                        </span>
+                        <span v-if="item.quantity >= 10000" style="font-size:12px;border-radius:3px;border: 1px solid  #f70;text-align: center">
+                          <font style="color: #f70;">万次阅读</font>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="article-info">
+                      <!-- 是否置顶 -->
+                      <span v-if="item.isStick === 1">
+                        <span style="color:#ff7242">
+                          <i class="iconfont iconzhiding" /> 置顶
+                        </span>
+                        <span class="separator">|</span>
+                      </span>
+                      <!-- 发表时间 -->
+                      <v-icon size="14">mdi-calendar-month-outline</v-icon>
+                      {{ item.createTime | date }}
+                      <span class="separator">|</span>
+                      <!-- 文章分类 -->
+                      <router-link :to="'/categories/' + item.categoryId">
+                        <v-icon size="14">mdi-inbox-full</v-icon>
+                        {{ item.categoryName }}
+                      </router-link>
+                      <span class="separator">|</span>
+                      <!-- 文章标签 -->
+                      <router-link style="display:inline-block" :to="'/tags/' + tag.id" class="mr-1" v-for="tag of item.tagDTOList" :key="tag.id">
+                        <v-icon size="14">mdi-tag-multiple</v-icon>
+                        {{ tag.name }}
+                      </router-link>
+                    </div>
+                    <!-- 文章内容 -->
+                    <div class="article-content">
+                      {{ item.content }}
+                    </div>
+                  </div>
+                </div>
+                <div style="float: right;">
+                  <el-button type="success" @click="handleUpdate(item.id)">编辑</el-button>
+                  <router-link :to="'/articles/' + item.id">
+                    <el-button type="primary">阅读</el-button>
+                  </router-link>
+                </div>
+              </v-card>
+            </v-col>
+          </v-row>
+        </div>
+
       </v-col>
 
       <v-col>
@@ -110,21 +138,162 @@
         </div>
       </v-col>
     </v-row>
+
+    <!--添加or修改区域-->
+    <el-dialog :title="title" :visible.sync="centerDialogVisible" :before-close="closeModel" fullscreen center>
+      <el-form :rules="rules" ref="dataForm" :model="article" style="margin-top: 10px">
+        <el-row>
+          <el-col :span="14">
+            <el-form-item label="文章名称" :label-width="formLabelWidth" prop="title">
+              <el-input v-model="article.title" auto-complete="off"></el-input>
+            </el-form-item>
+            <el-form-item label="文章简介" :label-width="formLabelWidth" prop="summary">
+              <el-input auto-complete="off" v-model="article.summary"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="标题图" :label-width="formLabelWidth">
+              <el-col :span="2">
+                <el-popover placement="top" width="160" trigger="hover" v-model="visible">
+                  <div style="text-align: right; margin: 0">
+                    <el-button size="mini" type="text" @click="visible = false">取消</el-button>
+                    <el-button type="primary" size="mini" @click="randomImg()">确定</el-button>
+                  </div>
+                </el-popover>
+              </el-col>
+              <el-col :span="2">
+                <el-upload style="width: 80px;height: 80px" class="avatar-uploader" :show-file-list="false" ref="upload" name="filedatas" :action="uploadPictureHost" :before-upload="uploadBefore" :http-request="uploadSectionFile" multiple>
+                  <img v-if="article.avatar" :src="article.avatar" class="imgAvatar">
+                  <i v-else class="el-icon-plus avatar-img-icon"></i>
+                </el-upload>
+              </el-col>
+
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6.5">
+            <el-form-item label="标签" :label-width="formLabelWidth" prop="tags">
+              <el-tag v-for="(item, index) of article.tags" :key="index" style="margin:0 1rem 0 0" :closable="true" @close="removeTag(item)">
+                {{ item }}
+              </el-tag>
+              <!-- 标签选项 -->
+              <el-popover placement="bottom-start" width="460" trigger="click" v-if="article.tags && article.tags.length < 3">
+                <div class="popover-title">标签</div>
+                <!-- 搜索框 -->
+                <el-input style="width:100%" v-model="tagName" placeholder="请输入标签名,enter添加自定义标签" @keyup.enter.native="saveTag" />
+                <!-- 标签 -->
+                <div class="popover-container">
+                  <div>添加标签</div>
+                  <el-tag v-for="(item, index) of tags" :key="index" style="margin-left: 3px;margin-top: 2px" :class="tagClass(item)" @click="addTag(item)">
+                    {{ item.name }}
+                  </el-tag>
+                </div>
+                <el-button type="primary" plain slot="reference" size="small">
+                  添加标签
+                </el-button>
+              </el-popover>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6.5">
+            <el-form-item label="分类" :label-width="formLabelWidth" prop="categoryName">
+              <el-tag type="success" v-show="article.categoryName" style="margin:0 1rem 0 0" :closable="true" @close="removeCategory">
+                {{ article.categoryName }}
+              </el-tag>
+              <!-- 分类选项 -->
+              <el-popover placement="bottom-start" width="460" trigger="click" v-if="!article.categoryName">
+                <div class="popover-title">分类</div>
+                <!-- 输入框 -->
+                <el-input style="width:100%" v-model="categoryName" placeholder="请输入分类名,enter添加自定义分类" @keyup.enter.native="saveCategory" />
+                <!-- 分类 -->
+                <div class="popover-container">
+                  <div>添加分类</div>
+                  <el-tag v-for="(item, index) of category" :key="index" style="margin-left: 3px;margin-top: 2px" class="category-item" @click="addCategory(item)">
+                    {{ item.name }}
+                  </el-tag>
+                </div>
+                <el-button type="success" plain slot="reference" size="small">
+                  添加分类
+                </el-button>
+              </el-popover>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6.5">
+            <el-form-item :label-width="formLabelWidth" label="是否置顶" prop="isStick">
+              <el-radio-group v-model="article.isStick" size="small">
+                <el-radio v-for="(item,index) in yesOrNoList" :key="index" :label="index" border>{{ item }}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="6.5">
+            <el-form-item :label-width="formLabelWidth" label="是否发布" prop="isPublish">
+              <el-radio-group v-model="article.isPublish" size="small">
+                <el-radio v-for="(item,index) in publishList" :key="index" :label="index" border>{{ item }}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="5">
+            <el-form-item :label-width="formLabelWidth" label="是否私密" prop="isSecret">
+              <el-radio-group v-model="article.isSecret" size="small">
+                <el-radio v-for="(item,index) in secretList" :key="index" :label="index" border>{{ item }}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item :label-width="formLabelWidth" label="创作类型" prop="isOriginal">
+              <el-radio-group v-model="article.isOriginal" size="small">
+                <el-radio v-for="(item,index) in isOriginalList" :key="index" :label="index" border>{{ item }}</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col v-if="article.isOriginal === 0" :span="5">
+            <el-form-item :label-width="formLabelWidth" label="原文链接" prop="originalUrl">
+              <el-input v-model="article.originalUrl"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item :label-width="formLabelWidth" label="关键词">
+              <el-input v-model="article.keywords"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="5">
+            <el-form-item :label-width="formLabelWidth" label="备注">
+              <el-input v-model="article.remark"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item :label-width="formLabelWidth" label="内容" prop="contentMd">
+              <mavon-editor placeholder="输入文章内容..." style="height: 500px" ref=md v-model="article.contentMd" @imgDel="imgDel" @change="" @imgAdd="imgAdd" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="centerDialogVisible = false">取 消</el-button>
+        <el-button v-if="canAdd || canUpdate" type="primary" @click="submit">确定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import { update, save, info, } from '@/api/articles'
+import { upload, delBatchFile } from '@/api/imgUpload'
+import { fetchCategory } from '@/api/category'
+import { fetchTags } from '@/api/tags'
 import { fetchList } from "@/api";
-
+import { hasAuth } from '@/utils/auth'
 export default {
-  mounted: function () {
-    let script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src =
-      "https://widget.qweather.net/standard/static/js/he-standard-common.js?v=2.0";
-    document.getElementsByTagName("head")[0].appendChild(script);
-
+  mounted() {
     this.getBlogList()
+    this.getCategoryList()
+    fetchTags({ pageNo: 1, pageSize: 100 }).then(res => {
+      this.tags = res.data.records
+    })
   },
   data: function () {
     return {
@@ -134,6 +303,35 @@ export default {
         pageSize: 9,
         total: 0
       },
+      rules: {
+        'title': [{ required: true, message: '必填字段', trigger: 'blur' }],
+        'summary': [{ required: true, message: '必填字段', trigger: 'blur' }],
+        'tags': [{ required: true, message: '必填字段', trigger: 'blur' }],
+        'categoryName': [{ required: true, message: '必填字段', trigger: 'blur' }],
+        'isSecret': [{ required: true, message: '必填字段', trigger: 'change' }],
+        'isStick': [{ required: true, message: '必填字段', trigger: 'change' }],
+        'isPublish': [{ required: true, message: '必填字段', trigger: 'change' }],
+        'isOriginal': [{ required: true, message: '必填字段', trigger: 'change' }],
+        'originalUrl': [{ required: true, message: '必填字段', trigger: 'blur' }],
+        'contentMd': [{ required: true, message: '必填字段', trigger: 'change' }]
+      },
+      secretList: ["公开", "私密"],
+      isOriginalList: ["转载", "原创"],
+      yesOrNoList: ["否", "是"],
+      yesOrNoStyle: ['danger', 'success'],
+      publishList: ['下架', '发布'],
+      formLabelWidth: "120px",
+      uploadPictureHost: process.env.VUE_APP_BASE_API + "/file/upload",
+      centerDialogVisible: false,
+      visible: false,
+      title: "",
+      isEditForm: 0,
+      categoryName: "",
+      tagName: "",
+      article: {},
+      category: [],
+      tags: [],
+      loading: [],
     };
   },
 
@@ -161,69 +359,230 @@ export default {
     handleCurrentChange(pageNo) {
       this.params.pageNo = pageNo
       this.getBlogList()
+    },
+    submit: function () {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.article.content = this.$refs.md.d_render
+          if (this.isEditForm) {
+            update(this.article).then(res => {
+              this.$message.success("修改文章成功")
+              this.closeDialogForm()
+            }).catch(err => {
+              console.log(err)
+            })
+          } else {
+            save(this.article).then(res => {
+              this.$message.success("添加文章成功")
+              this.closeDialogForm()
+            }).catch(err => {
+              console.log(err)
+            })
+          }
+        } else {
+          this.$message.error("存在必填字段未填")
+        }
+      })
+    },
+    imgAdd: function (pos, $file) {
+      var formdata = new FormData();
+      formdata.append('multipartFile', $file);
+      upload(formdata).then(res => {
+        this.$refs.md.$img2Url(pos, res.data);
+      }).catch(err => {
+        console.log(err)
+      })
+    },
+    imgDel: function (filename) {
+      delBatchFile(filename[0].split(this.img)[1])
+    },
+    getCategoryList: function () {
+      fetchCategory({ pageNo: 1, pageSize: 100 }).then(res => {
+        this.category = res.data.records
+      })
+    },
+    addCategory: function (item) {
+      this.article.categoryName = item.name
+    },
+    saveCategory: function () {
+      if (this.categoryName.trim() !== "") {
+        this.article.categoryName = this.categoryName
+      }
+    },
+    removeCategory: function () {
+      this.article.categoryName = null
+    },
+    addTag: function (item) {
+      if (this.article.tags.length > 2) {
+        this.$message.error("最多添加三个标签,如需继续添加,请先删除一个!")
+        return false;
+      }
+      if (this.article.tags.indexOf(item.name) === -1) {
+        this.article.tags.push(item.name);
+      }
+    },
+    saveTag: function () {
+      if (this.tagName.trim() !== "") {
+        this.addTag({
+          name: this.tagName
+        });
+        this.tagName = "";
+      }
+    },
+    removeTag: function (item) {
+      const index = this.article.tags.indexOf(item);
+      this.article.tags.splice(index, 1);
+    },
+    closeModel: function (done) {
+      if (this.article.title != null && this.article.title !== ""
+        && (this.article.tags.length > 0 || (this.article.categoryName != null && this.article.categoryName !== ""))) {
+        this.$confirm("是否关闭博客编辑窗口", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          sessionStorage.setItem("article", JSON.stringify(this.article));
+          done();
+        }).catch(() => {
+          this.$message.info("已取消")
+        });
+      } else {
+        done();
+      }
+    },
+    uploadBefore: function () {
+      this.openLoading()
+    },
+    // 打开加载层
+    openLoading: function () {
+      this.loading = this.$loading({
+        lock: true,
+        text: "正在加载中~",
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)"
+      });
+    },
+    uploadSectionFile: function (param) {
+      this.files = param.file
+      // FormData 对象
+      var formData = new FormData()
+      // 文件对象
+      formData.append('multipartFile', this.files)
+      upload(formData).then(res => {
+        this.article.avatar = res.data
+      })
+      this.loading.close()
+    },
+    handleAdd: function () {
+      this.fileList = []
+      let article = sessionStorage.getItem("article");
+      if (article != null) {
+        this.$confirm('还有上次未完成的博客编辑，是否继续编辑?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.initModel(JSON.parse(article))
+        }).catch(() => {
+          this.initModel(this.getFormObject())
+          sessionStorage.removeItem("article")
+        })
+      } else {
+        this.initModel(this.getFormObject())
+      }
+    },
+    initModel: function (article) {
+      this.article = article
+      if (this.article.id != null) {
+        this.beforeShow('修改文章', 1)
+      } else {
+        this.beforeShow('新增文章', 0)
+      }
+    },
+    getFormObject: function () {
+      return {
+        id: null,
+        title: '',
+        avatar: '',
+        summary: '',
+        quantity: 0,
+        content: '',
+        contentMd: '',
+        isSecret: 0,
+        isStick: 0,
+        isOriginal: 1,
+        remark: '',
+        keywords: '',
+        categoryName: null,
+        isPublish: 1,
+        tags: []
+      };
+    },
+    beforeShow: function (title, isEditForm) {
+      this.title = title
+      this.isEditForm = isEditForm
+      this.centerDialogVisible = true
+    },
+    handleUpdate: function (blogId) {
+      info(blogId).then(res => {
+        this.article = res.data
+        this.beforeShow("修改文章", 1)
+      })
+    },
+    tagClass() {
+      return function (item) {
+        const index = this.article.tags.indexOf(item.name);
+        return index !== -1 ? "tag-item-select" : "tag-item";
+      };
     }
   },
   computed: {
     blogInfo() {
       return this.$store.state.blogInfo;
     },
+    canAdd: function () {
+      return hasAuth(this.pres, '/system/article/add')
+    },
+    canUpdate: function () {
+      return hasAuth(this.pres, '/system/article/update')
+    },
   },
 };
 </script>
 
-<style lang="stylus">
-.typed-cursor {
-  opacity: 1;
-  animation: blink 0.7s infinite;
-}
-
-@keyframes blink {
-  0% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-</style>
+<style lang="stylus"></style>
 
 <style scoped lang="scss">
+.blog-sider {
+  height: 100%;
+}
+
+.blog-sider-function {
+  height: 500px;
+  padding: 150px 50px;
+  text-align: center;
+}
+
+.blog-wrapper {
+  margin-top: 15px;
+  height: 400px;
+}
+
 .article-wrapper {
   font-size: 14px;
 }
-
 @media (min-width: 760px) {
-  .blog-title {
-    font-size: 2.5rem;
-  }
-
-  .blog-intro {
-    font-size: 1.5rem;
-  }
-
-  .blog-contact {
-    display: none;
-  }
-
-  .home-container {
-    max-width: 1200px;
-    margin: calc(5vh - 48px) auto 28px auto;
+  .blog-container {
+    max-width: 2000px;
+    margin: 0 auto 0 auto;
     padding: 0 5px;
   }
 
   .article-card {
-    // display: inline-block;
-    align-items: center;
-    height: 250px;
-    width: 32%;
-    margin-top: 20px;
-    margin-left: 15px;
+    height: 290px;
+    width: 32.83%;
     float: left;
+    margin: 5px 0.25%;
   }
 
   .article-cover {
@@ -241,7 +600,7 @@ export default {
   }
 
   .article-wrapper {
-    padding: 2.5rem 2.5rem;
+    padding: 2rem;
   }
 
   .article-wrapper a {
@@ -251,18 +610,14 @@ export default {
 }
 
 @media (max-width: 759px) {
-  .blog-title {
-    font-size: 26px;
-  }
-
-  .blog-contact {
-    font-size: 1.25rem;
-    line-height: 2;
+  .blog-container {
+    width: 100%;
+    margin: calc(100vh - 66px) auto 0 auto;
+    padding: 0 5px;
   }
 
   .home-container {
     width: 100%;
-    margin: calc(100vh - 66px) auto 0 auto;
   }
 
   .article-card {
@@ -314,11 +669,6 @@ export default {
   -webkit-box-orient: vertical;
 }
 
-.blog-wrapper {
-  position: sticky;
-  top: 10px;
-}
-
 .blog-card {
   line-height: 2;
   padding: 1.25rem 1.5rem;
@@ -332,13 +682,16 @@ export default {
 }
 
 .author-wrapper {
-  text-align: center;
+  // text-align: center;
+  position: absolute;
+  bottom: 50px;
+  left: 50px;
 }
 
 .blog-info-wrapper {
   display: flex;
-  justify-self: center;
-  padding: 0.875rem 0;
+  // justify-self: center;
+  // padding: 0.875rem 0;
 }
 
 .blog-info-data {
