@@ -2,7 +2,7 @@
   <v-footer app padless absolute v-if="!this.isMessage">
     <div class="footer-wrap">
       <div>
-        ©{{  2021 }} -
+        ©{{  2023 }} -
         {{ new Date().getFullYear() }} By
         {{blogInfo.webSite.author}}
       </div>

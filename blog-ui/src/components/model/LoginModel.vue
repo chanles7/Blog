@@ -6,7 +6,7 @@
       </v-icon>
       <div class="login-wrapper">
         <!-- 用户名 -->
-        <v-text-field v-model="username" label="邮箱号" :disabled="false" placeholder="请输入您的邮箱号" clearable @keyup.enter="login" />
+        <v-text-field v-model="username" label="账户名" :disabled="false" placeholder="请输入您的账户名" clearable @keyup.enter="login" />
         <!-- 密码 -->
         <v-text-field v-model="password" class="mt-7" label="密码" :disabled="false" placeholder="请输入您的密码" @keyup.enter="login" :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'" :type="show ? 'text' : 'password'" @click:append="show = !show" />
         <!-- 按钮 -->
@@ -37,7 +37,8 @@
 </template>
 
 <script>
-import { emailLogin } from "../../api";
+import { simpleLogin } from "@/api/user";
+import { setToken } from '@/utils/auth'
 export default {
   data: function () {
     return {
@@ -84,70 +85,74 @@ export default {
       this.$store.state.forgetFlag = true;
     },
     login() {
-      var reg = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+      var reg = /^[a-zA-Z]{4,10}$/;
       if (!reg.test(this.username)) {
-        this.$toast({ type: "error", message: "邮箱格式不正确" });
+        this.$toast({ type: "error", message: "账户格式不正确" });
         return false;
       }
-      if (this.password.trim().length === 0) {
-        this.$toast({ type: "error", message: "密码不能为空" });
+      if (this.password.trim().length < 6) {
+        this.$toast({ type: "error", message: "密码格式不正确" });
         return false;
       }
       //发送登录请求
-      emailLogin({ email: this.username, password: this.password }).then(res => {
-        this.username = "";
-        this.password = "";
+      const user = {
+        username: this.username,
+        password: this.password,
+      };
+      simpleLogin(user).then(res => {
+        this.$store.state.loginFlag = false;
         this.$store.commit("login", res.data);
-        this.$store.commit("closeModel");
-        this.$toast({ type: "success", message: "登录成功" });
+        setToken(res.data.token)
+        this.$message.success("登录成功");
+        this.$router.go(0);
       }).catch(err => {
-        this.$toast({ type: "error", message: err.message });
+        this.$message.error(err.message);
       });
     },
     qqLogin() {
       //保留当前路径
-      this.$store.commit("saveLoginUrl", this.$route.path);
-      if (
-        navigator.userAgent.match(
-          /(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i
-        )
-      ) {
-        // eslint-disable-next-line no-undef
-        QC.Login.showPopup({
-          appId: this.config.QQ_CLIENT_ID,
-          redirectURI: this.config.QQ_REDIRECT_URL
-        });
-      } else {
-        window.open(
-          "https://graph.qq.com/oauth2.0/show?which=Login&display=pc&client_id=" +
-          + this.config.QQ_CLIENT_ID +
-          "&response_type=token&scope=all&redirect_uri=" +
-          this.config.QQ_REDIRECT_URL,
-          "_self"
-        );
-      }
+      // this.$store.commit("saveLoginUrl", this.$route.path);
+      // if (
+      //   navigator.userAgent.match(
+      //     /(iPhone|iPod|Android|ios|iOS|iPad|Backerry|WebOS|Symbian|Windows Phone|Phone)/i
+      //   )
+      // ) {
+      //   // eslint-disable-next-line no-undef
+      //   QC.Login.showPopup({
+      //     appId: this.config.QQ_CLIENT_ID,
+      //     redirectURI: this.config.QQ_REDIRECT_URL
+      //   });
+      // } else {
+      //   window.open(
+      //     "https://graph.qq.com/oauth2.0/show?which=Login&display=pc&client_id=" +
+      //     + this.config.QQ_CLIENT_ID +
+      //     "&response_type=token&scope=all&redirect_uri=" +
+      //     this.config.QQ_REDIRECT_URL,
+      //     "_self"
+      //   );
+      // }
     },
     giteeLogin() {
       //保留当前路径
-      this.$store.commit("saveLoginUrl", this.$route.path);
-      window.open(
-        "https://gitee.com/oauth/authorize?client_id=" +
-        this.config.GITEE_CLIENT_ID +
-        "&response_type=code&redirect_uri=" +
-        this.config.GITEE_REDIRECT_URL,
-        "_self"
-      );
+      // this.$store.commit("saveLoginUrl", this.$route.path);
+      // window.open(
+      //   "https://gitee.com/oauth/authorize?client_id=" +
+      //   this.config.GITEE_CLIENT_ID +
+      //   "&response_type=code&redirect_uri=" +
+      //   this.config.GITEE_REDIRECT_URL,
+      //   "_self"
+      // );
     },
     weiboLogin() {
       //保留当前路径
-      this.$store.commit("saveLoginUrl", this.$route.path);
-      window.open(
-        "https://api.weibo.com/oauth2/authorize?client_id=" +
-        this.config.WEIBO_CLIENT_ID +
-        "&response_type=code&redirect_uri=" +
-        this.config.WEIBO_REDIRECT_URL,
-        "_self"
-      );
+      // this.$store.commit("saveLoginUrl", this.$route.path);
+      // window.open(
+      //   "https://api.weibo.com/oauth2/authorize?client_id=" +
+      //   this.config.WEIBO_CLIENT_ID +
+      //   "&response_type=code&redirect_uri=" +
+      //   this.config.WEIBO_REDIRECT_URL,
+      //   "_self"
+      // );
     }
   }
 };

@@ -19,13 +19,13 @@ import 'highlight.js/styles/atom-one-dark.css'
 import VueImageSwipe from 'vue-image-swipe'
 import 'vue-image-swipe/dist/vue-image-swipe.css'
 import Toast from './components/toast/index'
-import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import MetaInfo from 'vue-meta-info'
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
+import '@/permission.js'
 Vue.use(MetaInfo)
 Vue.use(mavonEditor)
 Vue.prototype.config = config
@@ -56,27 +56,6 @@ Vue.filter('num', function(value) {
     return (value / 1000).toFixed(1) + 'k'
   }
   return value
-})
-
-router.beforeEach((to, from, next) => {
-  if (to.path) {
-    if (window._hmt) {
-      window._hmt.push(['_trackPageview', to.fullPath])
-    }
-  }
-  NProgress.start()
-  if (to.meta.title) {
-    document.title = to.meta.title
-  }
-  next()
-})
-
-router.afterEach(() => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'instant'
-  })
-  NProgress.done()
 })
 
 axios.interceptors.response.use(

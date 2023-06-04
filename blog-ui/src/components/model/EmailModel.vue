@@ -6,34 +6,16 @@
       </v-icon>
       <div class="login-wrapper">
         <!-- 用户名 -->
-        <v-text-field
-          v-model="email"
-          label="邮箱号"
-          placeholder="请输入您的邮箱号"
-          clearable
-          @keyup.enter="register"
-        />
+        <v-text-field v-model="email" label="邮箱号" placeholder="请输入您的邮箱号" clearable @keyup.enter="register" />
         <!-- 验证码 -->
         <div class="mt-7 send-wrapper">
-          <v-text-field
-            maxlength="6"
-            v-model="code"
-            label="验证码"
-            placeholder="请输入6位验证码"
-            @keyup.enter="register"
-          />
+          <v-text-field maxlength="6" v-model="code" label="验证码" placeholder="请输入6位验证码" @keyup.enter="register" />
           <v-btn text small :disabled="flag" @click="sendCode">
             {{ codeMsg }}
           </v-btn>
         </div>
         <!-- 按钮 -->
-        <v-btn
-          class="mt-7"
-          block
-          color="blue"
-          style="color:#fff"
-          @click="saveUserEmail"
-        >
+        <v-btn class="mt-7" block color="blue" style="color:#fff" @click="saveUserEmail">
           绑定
         </v-btn>
       </div>
@@ -42,9 +24,9 @@
 </template>
 
 <script>
-import {sendEmailCode,bindEmail} from "../../api";
+// import {sendEmailCode,bindEmail} from "../../api";
 export default {
-  data: function() {
+  data: function () {
     return {
       email: this.$store.state.email,
       code: "",
@@ -57,12 +39,12 @@ export default {
   methods: {
     sendCode() {
       //发送邮件
-      sendEmailCode(this.email).then(res => {
-            this.$toast({ type: "success", message: res.message });
-            this.countDown();
-        }).catch(err =>{
-            this.$toast({ type: "error", message: err.message });
-      });
+      // sendEmailCode(this.email).then(res => {
+      //       this.$toast({ type: "success", message: res.message });
+      //       this.countDown();
+      //   }).catch(err =>{
+      //       this.$toast({ type: "error", message: err.message });
+      // });
     },
     countDown() {
       this.flag = true;
@@ -92,12 +74,12 @@ export default {
         code: this.code
       };
       bindEmail(user).then(res => {
-          this.$store.commit("saveEmail", this.email);
-          this.email = "";
-          this.code = "";
-          this.$store.commit("closeModel");
-          this.$toast({ type: "success", message: res.message });
-      }).catch(err =>{
+        this.$store.commit("saveEmail", this.email);
+        this.email = "";
+        this.code = "";
+        this.$store.commit("closeModel");
+        this.$toast({ type: "success", message: res.message });
+      }).catch(err => {
         this.$toast({ type: "error", message: err.message });
       });
     }

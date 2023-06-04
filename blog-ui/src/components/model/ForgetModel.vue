@@ -6,45 +6,18 @@
       </v-icon>
       <div class="login-wrapper">
         <!-- 用户名 -->
-        <v-text-field
-          v-model="username"
-          label="邮箱号"
-          placeholder="请输入您的邮箱号"
-          clearable
-          @keyup.enter="forget"
-        />
+        <v-text-field v-model="username" label="邮箱号" placeholder="请输入您的邮箱号" clearable @keyup.enter="forget" />
         <!-- 验证码 -->
         <div class="mt-7 send-wrapper">
-          <v-text-field
-            maxlength="6"
-            v-model="code"
-            label="验证码"
-            placeholder="请输入6位验证码"
-            @keyup.enter="forget"
-          />
+          <v-text-field maxlength="6" v-model="code" label="验证码" placeholder="请输入6位验证码" @keyup.enter="forget" />
           <v-btn :disabled="flag" text small @click="sendCode">
             {{ codeMsg }}
           </v-btn>
         </div>
         <!-- 密码 -->
-        <v-text-field
-          v-model="password"
-          class="mt-7"
-          label="密码"
-          placeholder="请输入您的密码"
-          @keyup.enter="forget"
-          :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-          :type="show ? 'text' : 'password'"
-          @click:append="show = !show"
-        />
+        <v-text-field v-model="password" class="mt-7" label="密码" placeholder="请输入您的密码" @keyup.enter="forget" :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'" :type="show ? 'text' : 'password'" @click:append="show = !show" />
         <!-- 按钮 -->
-        <v-btn
-          class="mt-7"
-          block
-          color="green"
-          style="color:#fff"
-          @click="forget"
-        >
+        <v-btn class="mt-7" block color="green" style="color:#fff" @click="forget">
           确定
         </v-btn>
         <!-- 登录 -->
@@ -57,9 +30,9 @@
 </template>
 
 <script>
-import { sendEmailCode, emailRegister, emailLogin, updatePassword } from "../../api";
+import { updatePassword } from "../../api";
 export default {
-  data: function() {
+  data: function () {
     return {
       username: "",
       code: "",
@@ -79,8 +52,8 @@ export default {
       //发送邮件
       this.countDown();
       sendEmailCode(this.username).then(res => {
-        this.$toast({ type: "success", message:res.message });
-      }).catch(err =>{
+        this.$toast({ type: "success", message: res.message });
+      }).catch(err => {
         this.$toast({ type: "error", message: err.message });
       });
     },
@@ -118,7 +91,7 @@ export default {
       };
       updatePassword(user).then(res => {
         this.$toast({ type: "success", message: res.message });
-      }).catch(err =>{
+      }).catch(err => {
         this.$toast({ type: "error", message: err.message });
       });
     }

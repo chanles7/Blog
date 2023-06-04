@@ -32,7 +32,7 @@
             <i class="iconfont iconzhuye" /> 首页
           </router-link>
         </div>
-        <div class="menus-item">
+        <!-- <div class="menus-item">
           <a class="menu-btn">
             <i class="iconfont iconfaxian" /> 发现
             <i class="iconfont iconxiangxia2 expand" />
@@ -67,7 +67,7 @@
               </router-link>
             </li>
           </ul>
-        </div>
+        </div> -->
         <div class="menus-item">
           <router-link class="menu-btn" to="/links">
             <i class="iconfont iconlianjie" /> 友链
@@ -75,7 +75,7 @@
         </div>
         <div class="menus-item">
           <router-link class="menu-btn" to="/about">
-            <i class="iconfont iconzhifeiji" /> 关于
+            <i class="iconfont iconzhifeiji" /> 关于开发者
           </router-link>
         </div>
         <div class="menus-item">
@@ -83,17 +83,17 @@
             <i class="iconfont iconpinglunzu" /> 留言
           </router-link>
         </div>
-        <div class="menus-item">
+        <div class="menus-item" v-if="hasToken">
           <router-link class="menu-btn" to="/blog">
             <i class="iconfont iconpinglunzu" /> 我的博客
           </router-link>
         </div>
         <div class="menus-item">
-          <a class="menu-btn" v-if="!this.$store.state.avatar" @click="openLogin">
+          <a class="menu-btn" v-if="!hasToken" @click="openLogin">
             <i class="iconfont icondenglu" /> 登录
           </a>
           <template v-else>
-            <img class="user-avatar" :src="this.$store.state.avatar" height="30" width="30" />
+            <el-avatar :size="40" :src="this.$store.state.avatar" />
             <ul class="menus-submenu">
               <li>
                 <router-link to="/user">
@@ -112,15 +112,19 @@
 </template>
 
 <script>
-import { logout } from "../../api";
+import { logout } from "@/api";
+import { hasToken, removeToken } from "@/utils/auth"
 
 export default {
   mounted() {
     window.addEventListener("scroll", this.scroll);
+
+    this.hasToken = hasToken()
   },
   data: function () {
     return {
-      navClass: ""
+      navClass: "",
+      hasToken: true
     };
   },
   methods: {
@@ -151,8 +155,11 @@ export default {
       }
       logout().then(res => {
         this.$store.commit("logout");
-        this.$toast({ type: "success", message: "注销成功" });
+        this.$message.success("注销成功");
+        this.hasToken = false
+        removeToken()
       }).catch(err => {
+        this.$message.error(err.message);
       });
     }
   },
@@ -163,7 +170,7 @@ export default {
     blogInfo() {
       return this.$store.state.blogInfo;
     }
-  }
+  },
 };
 </script>
 
@@ -247,10 +254,6 @@ ul {
   background-color: #80c8f8;
   content: "";
   transition: all 0.3s ease-in-out;
-}
-.user-avatar {
-  cursor: pointer;
-  border-radius: 50%;
 }
 .menus-item:hover .menus-submenu {
   display: block;

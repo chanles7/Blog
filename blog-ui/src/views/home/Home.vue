@@ -88,17 +88,11 @@
           </div>
         </v-card>
         <v-card class="animated zoomIn article-card" style="border-radius: 12px 8px 8px 12px" v-for="(item, index) of articleList" :key="item.id">
-          <!-- 文章封面图 -->
-          <!-- <div :class="isRight(index)">
-            <router-link :to="'/articles/' + item.id">
-              <v-img class="on-hover" width="100%" height="100%" :src="item.avatar" />
-            </router-link>
-          </div> -->
           <!-- 文章信息 -->
           <div class="article-wrapper">
             <div style="line-height:1.4">
               <div>
-                <router-link :to="'/articles/' + item.id">
+                <router-link :to="'/articles/' + item.id" style="color: blue">
                   {{ item.title }}
                 </router-link>
                 <span v-if="item.quantity >= 1000 && item.quantity < 10000" style="font-size:12px;border-radius:3px;border: 1px solid  #f70;text-align: center">
@@ -110,13 +104,6 @@
               </div>
             </div>
             <div class="article-info">
-              <!-- 是否置顶 -->
-              <span v-if="item.isStick === 1">
-                <span style="color:#ff7242">
-                  <i class="iconfont iconzhiding" /> 置顶
-                </span>
-                <span class="separator">|</span>
-              </span>
               <!-- 发表时间 -->
               <v-icon size="14">mdi-calendar-month-outline</v-icon>
               {{ item.createTime | date }}
@@ -133,10 +120,22 @@
                 {{ tag.name }}
               </router-link>
             </div>
+
             <!-- 文章内容 -->
             <div class="article-content">
               {{ item.content }}
             </div>
+            <el-row>
+              <el-col :md="2" :cols="12">
+                <!-- <el-avatar :size="80" src="https://empty" @error="errorHandler">
+                  <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
+                </el-avatar> -->
+                1
+              </el-col>
+              <el-col :md="10" :cols="12">
+                sad
+              </el-col>
+            </el-row>
           </div>
         </v-card>
 

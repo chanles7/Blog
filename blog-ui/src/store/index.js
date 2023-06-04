@@ -1,11 +1,12 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import createPersistedState from 'vuex-persistedstate';
+import Vue from 'vue'
+import Vuex from 'vuex'
+import createPersistedState from 'vuex-persistedstate'
 
-Vue.use(Vuex);
+Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    token: '',
     searchFlag: false,
     loginFlag: false,
     registerFlag: false,
@@ -20,7 +21,6 @@ export default new Vuex.Store({
     webSite: null,
     loginType: null,
     email: null,
-    token: null,
     dialogFormVisible: false,
     articleLikeSet: [],
     commentLikeSet: [],
@@ -44,98 +44,88 @@ export default new Vuex.Store({
         name: null,
         summary: null,
         webUrl: null,
-        showList: '',
+        showList: ''
       },
       count: {
         articleCount: null,
         categoryCount: null,
         tagCount: null,
-        viewsCount: null,
+        viewsCount: null
       },
       pageList: [
         {
           pageCover: null,
-          pageLabel: null,
-        },
-      ],
-    },
+          pageLabel: null
+        }
+      ]
+    }
   },
   mutations: {
     login(state, user) {
-      state.userId = user.id;
-      state.avatar = user.avatar;
-      state.nickname = user.nickname;
-      state.intro = user.intro;
-      state.webSite = user.webSite;
-      state.articleLikeSet = user.articleLikeSet ? user.articleLikeSet : [];
-      state.commentLikeSet = user.commentLikeSet ? user.commentLikeSet : [];
-      state.email = user.email;
-      state.token = user.token;
-      state.loginType = user.loginType;
+      state.nickname = user.nickname
+      state.avatar = user.avatar
+      state.loginType = user.loginType
+      state.articleLikeSet = user.articleLikeSet ? user.articleLikeSet : []
+      state.commentLikeSet = user.commentLikeSet ? user.commentLikeSet : []
     },
     logout(state) {
-      state.userId = null;
-      state.avatar = null;
-      state.nickname = null;
-      state.intro = null;
-      state.token = null;
-      state.webSite = null;
-      state.articleLikeSet = [];
-      state.commentLikeSet = [];
-      state.email = null;
-      state.loginType = null;
+      state.nickname = null
+      state.avatar = null
+      state.loginType = null
+      state.articleLikeSet = []
+      state.commentLikeSet = []
     },
     saveLoginUrl(state, url) {
-      state.loginUrl = url;
+      state.loginUrl = url
     },
     saveEmail(state, email) {
-      state.email = email;
+      state.email = email
     },
     updateUserInfo(state, user) {
-      state.nickname = user.nickname;
-      state.intro = user.intro;
-      state.webSite = user.webSite;
+      state.nickname = user.nickname
+      state.intro = user.intro
+      state.webSite = user.webSite
     },
     savePageInfo(state, pageList) {
-      state.pageList = pageList;
+      state.pageList = pageList
     },
     updateAvatar(state, avatar) {
-      state.avatar = avatar;
+      state.avatar = avatar
     },
     checkBlogInfo(state, blogInfo) {
-      state.blogInfo = blogInfo;
+      state.blogInfo = blogInfo
     },
     closeModel(state) {
-      state.registerFlag = false;
-      state.loginFlag = false;
-      state.searchFlag = false;
-      state.emailFlag = false;
+      state.registerFlag = false
+      state.loginFlag = false
+      state.searchFlag = false
+      state.emailFlag = false
     },
     articleLike(state, articleId) {
-      var articleLikeSet = state.articleLikeSet;
+      var articleLikeSet = state.articleLikeSet
       if (articleLikeSet.indexOf(articleId) != -1) {
-        articleLikeSet.splice(articleLikeSet.indexOf(articleId), 1);
+        articleLikeSet.splice(articleLikeSet.indexOf(articleId), 1)
       } else {
-        articleLikeSet.push(articleId);
+        articleLikeSet.push(articleId)
       }
     },
     commentLike(state, commentId) {
-      var commentLikeSet = state.commentLikeSet;
+      var commentLikeSet = state.commentLikeSet
       if (commentLikeSet.indexOf(commentId) != -1) {
-        commentLikeSet.splice(commentLikeSet.indexOf(commentId), 1);
+        commentLikeSet.splice(commentLikeSet.indexOf(commentId), 1)
       } else {
-        commentLikeSet.push(commentId);
+        commentLikeSet.push(commentId)
       }
     },
     setDialogFormVisible(state) {
-      state.dialogFormVisible = !state.dialogFormVisible;
-    },
+      state.dialogFormVisible = !state.dialogFormVisible
+    }
   },
   actions: {},
   modules: {},
   plugins: [
     createPersistedState({
-      storage: window.sessionStorage,
-    }),
-  ],
-});
+      storage: window.sessionStorage
+    })
+  ]
+})

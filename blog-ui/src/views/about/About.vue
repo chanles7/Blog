@@ -2,15 +2,21 @@
   <div>
     <!-- banner -->
     <div class="banner" :style="cover">
-      <h1 class="banner-title">关于我</h1>
+      <h1 class="banner-title">关于开发者</h1>
     </div>
     <!-- 关于我内容 -->
     <v-card class="blog-container">
-      <!-- 博主头像 -->
-      <div class="my-wrapper">
-        <v-avatar size="110">
-          <img class="author-avatar" :src="avatar" />
-        </v-avatar>
+      <v-avatar size="110">
+        <img class="author-avatar" :src="author.avatar" />
+      </v-avatar>
+      <div class="span-list">
+        <span>{{author.nickname}}</span>
+      </div>
+      <div class="span-list">
+        <span>文章数量：{{author.blogCount}}</span>
+      </div>
+      <div class="span-list">
+        <span>博客阅读量：{{author.blogViews}}</span>
       </div>
       <!-- 介绍 -->
       <div ref="about" class="about-content markdown-body" v-html="aboutContent" />
@@ -20,25 +26,14 @@
 
 <script>
 import Clipboard from "clipboard";
+import { getAuthorInfo } from '@/api/user'
 export default {
   created() {
     this.getAboutContent();
+    this.getAuthorInfo()
   },
   destroyed() {
     this.clipboard.destroy();
-  },
-  metaInfo: {
-    meta: [
-      {
-        name: "keyWords",
-        content: "北极星,开源博客,www.chales.online", //变量或字符串
-      },
-      {
-        name: "description",
-        content:
-          "一个专注于技术分享的博客平台,大家以共同学习,乐于分享,拥抱开源的价值观进行学习交流",
-      },
-    ],
   },
   data: function () {
     return {
@@ -46,9 +41,27 @@ export default {
       img: process.env.VUE_APP_IMG_API,
       clipboard: null,
       imgList: [],
+
+      author: {
+        avatar: '',
+        nickname: '',
+        authorInfo: '',
+        blogCount: '',
+        blogViews: '',
+      }
     };
   },
   methods: {
+    getAuthorInfo() {
+      getAuthorInfo().then((res) => {
+        const user = res.data
+        this.author.avatar = user.avatar
+        this.author.nickname = user.nickname
+        this.author.authorInfo = user.authorInfo
+        this.author.blogCount = user.blogCount || 1
+        this.author.blogViews = user.blogViews || 1
+      })
+    },
     getAboutContent() {
       const that = this;
       var aboutMe = this.$store.state.blogInfo.webSite.aboutMe;
@@ -150,9 +163,12 @@ export default {
   line-height: 1.8;
   font-size: 14px;
 }
-.my-wrapper {
+.blog-container {
   text-align: center;
 }
+/* div:not(:first-child) {
+  margin-top: 20px;
+} */
 .author-avatar {
   transition: all 0.5s;
 }
@@ -162,6 +178,10 @@ export default {
 </style>
 
 <style lang="scss">
+.span-list {
+  margin-top: 20px;
+}
+
 pre.hljs {
   padding: 12px 2px 12px 40px !important;
   border-radius: 5px !important;
