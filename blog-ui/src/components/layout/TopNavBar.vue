@@ -32,42 +32,6 @@
             <i class="iconfont iconzhuye" /> 首页
           </router-link>
         </div>
-        <!-- <div class="menus-item">
-          <a class="menu-btn">
-            <i class="iconfont iconfaxian" /> 发现
-            <i class="iconfont iconxiangxia2 expand" />
-          </a>
-          <ul class="menus-submenu">
-            <li>
-              <router-link to="/archives">
-                <i class="iconfont iconguidang" /> 归档
-              </router-link>
-            </li>
-            <li>
-              <router-link to="/categories">
-                <i class="iconfont iconfenlei" /> 分类
-              </router-link>
-            </li>
-            <li>
-              <router-link to="/tags">
-                <i class="iconfont iconbiaoqian" /> 标签
-              </router-link>
-            </li>
-          </ul>
-        </div>
-        <div class="menus-item">
-          <a class="menu-btn">
-            <i class="iconfont iconqita" /> 娱乐
-            <i class="iconfont iconxiangxia2 expand" />
-          </a>
-          <ul class="menus-submenu">
-            <li>
-              <router-link to="/albums">
-                <i class="iconfont iconxiangce1" /> 相册
-              </router-link>
-            </li>
-          </ul>
-        </div> -->
         <div class="menus-item">
           <router-link class="menu-btn" to="/links">
             <i class="iconfont iconlianjie" /> 友链
@@ -84,7 +48,7 @@
           </router-link>
         </div>
         <div class="menus-item" v-if="hasToken">
-          <router-link class="menu-btn" to="/blog">
+          <router-link class="menu-btn" :to="{ path:'/blog', query:{ showDialog : false}}">
             <i class="iconfont iconpinglunzu" /> 我的博客
           </router-link>
         </div>
@@ -121,7 +85,7 @@ export default {
 
     this.hasToken = hasToken()
   },
-  data: function () {
+  data() {
     return {
       navClass: "",
       hasToken: true
@@ -158,6 +122,7 @@ export default {
         this.$message.success("注销成功");
         this.hasToken = false
         removeToken()
+        this.$router.go(0);
       }).catch(err => {
         this.$message.error(err.message);
       });

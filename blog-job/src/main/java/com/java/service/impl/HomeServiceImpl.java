@@ -61,21 +61,23 @@ public class HomeServiceImpl {
 
     /**
      * 文章、留言、用户、ip统计
+     *
      * @return
      */
-    public Map<String,Integer> lineCount(){
-        Map<String,Integer> map = new HashMap<>();
+    public Map<String, Integer> lineCount() {
+        Map<String, Integer> map = new HashMap<>();
         map.put("article", articleMapper.selectList(null).size());
-        map.put("message",messageMapper.selectList(null).size());
-        map.put("user",userMapper.selectCount(null));
-        map.put("viewsCount",(Integer) getViewsCount());
+        map.put("message", messageMapper.selectList(null).size());
+        map.put("user", userMapper.selectCount(null));
+        map.put("browseCount", (Integer) getBrowseCountCount());
+        map.put("userCount", (Integer) getUserCountCount());
         return map;
     }
 
     public HomeDataVO init() {
         //文章排行
         List<BlogArticle> blogArticles = articleMapper.selectList(new LambdaQueryWrapper<BlogArticle>()
-                .select(BlogArticle::getQuantity,BlogArticle::getTitle,BlogArticle::getId)
+                .select(BlogArticle::getQuantity, BlogArticle::getTitle, BlogArticle::getId)
                 .eq(BlogArticle::getIsPublish, PublishEnum.PUBLISH.getCode())
                 .orderByDesc(BlogArticle::getQuantity).last("limit 6"));
         //文章贡献度
@@ -85,7 +87,7 @@ public class HomeServiceImpl {
         //用户访问量
         List<Map<String, Object>> userAccess = this.userAccess();
 
-        List<Map<String,Object>> tagsList = tagsMapper.countTags();
+        List<Map<String, Object>> tagsList = tagsMapper.countTags();
         //弹出框
         SystemConfig systemConfig = systemConfigService.getCustomizeOne();
 
@@ -96,6 +98,7 @@ public class HomeServiceImpl {
 
     /**
      * redis监控
+     *
      * @return
      */
     public ResponseResult getCacheInfo() {
@@ -121,47 +124,50 @@ public class HomeServiceImpl {
     }
 
     //----------web端开始------------
+
     /**
      * 获取站点信息
+     *
      * @return
      */
     public ResponseResult webSiteInfo() {
         //网站信息
         WebConfig webConfig = webConfigService.getOne(new LambdaQueryWrapper<WebConfig>()
-                .select(WebConfig::getAuthorAvatar,WebConfig::getIsMusicPlayer,WebConfig::getAuthorInfo,WebConfig::getTouristAvatar,WebConfig::getBulletin,
-                        WebConfig::getQqNumber,WebConfig::getGitee,WebConfig::getGithub,WebConfig::getLogo,
-                        WebConfig::getAboutMe,WebConfig::getEmail,WebConfig::getShowList,WebConfig::getLoginTypeList,
-                        WebConfig::getRecordNum,WebConfig::getAuthor,WebConfig::getAliPay,WebConfig::getWeixinPay,
-                        WebConfig::getWebUrl, WebConfig::getSummary,WebConfig::getName,WebConfig::getKeyword)
-        .last(FieldConstants.LIMIT_ONE));
+                .select(WebConfig::getAuthorAvatar, WebConfig::getIsMusicPlayer, WebConfig::getAuthorInfo, WebConfig::getTouristAvatar, WebConfig::getBulletin,
+                        WebConfig::getQqNumber, WebConfig::getGitee, WebConfig::getGithub, WebConfig::getLogo,
+                        WebConfig::getAboutMe, WebConfig::getEmail, WebConfig::getShowList, WebConfig::getLoginTypeList,
+                        WebConfig::getRecordNum, WebConfig::getAuthor, WebConfig::getAliPay, WebConfig::getWeixinPay,
+                        WebConfig::getWebUrl, WebConfig::getSummary, WebConfig::getName, WebConfig::getKeyword)
+                .last(FieldConstants.LIMIT_ONE));
 
         //文章分类标签
         Integer articleCount = articleMapper.selectCount(new QueryWrapper<BlogArticle>().eq(FieldConstants.IS_PUBLISH, PublishEnum.PUBLISH.getCode()));
         Integer tagCount = tagsMapper.selectCount(null);
         Integer categoryCount = categoryMapper.selectCount(null);
         // 查询访问量
-        String viewsCount = getViewsCount().toString();
-        Map<String,Object> map = new HashMap<>();
-        map.put("articleCount",articleCount);
-        map.put("categoryCount",categoryCount);
-        map.put("tagCount",tagCount);
-        map.put("viewsCount",viewsCount);
+        Map<String, Object> map = new HashMap<>();
+        map.put("articleCount", articleCount);
+        map.put("categoryCount", categoryCount);
+        map.put("tagCount", tagCount);
+        map.put("browseCount", getBrowseCountCount());
+        map.put("userCount", getUserCountCount());
 
         //查询页面信息
         List<Page> pages = pageMapper.selectList(new LambdaQueryWrapper<Page>()
-                .select(Page::getPageCover,Page::getPageLabel));
+                .select(Page::getPageCover, Page::getPageLabel));
 
 
-        Map<String,Object> resultMap = new HashMap<>();
-        resultMap.put("pageList",pages);
-        resultMap.put("webSite",webConfig);
-        resultMap.put("count",map);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("pageList", pages);
+        resultMap.put("webSite", webConfig);
+        resultMap.put("count", map);
         return ResponseResult.success(resultMap);
 
     }
 
     /**
      * 添加访问量
+     *
      * @param request
      * @return
      */
@@ -188,13 +194,14 @@ public class HomeServiceImpl {
                 redisService.hIncr(RedisConstants.VISITOR_AREA, Constants.UNKNOWN, 1L);
             }
             // 访问量+1
-            redisService.incr(RedisConstants.BLOG_VIEWS_COUNT, 1);
+            redisService.incr(RedisConstants.WEBSITE_USER_COUNT, 1);
             // 保存唯一标识
             redisService.sAdd(RedisConstants.UNIQUE_VISITOR, md5);
         }
+        redisService.incr(RedisConstants.WEBSITE_BROWSE_COUNT, 1);
+
         return ResponseResult.success();
     }
-
 
 
     //--------------自定义方法开始---------------
@@ -210,8 +217,10 @@ public class HomeServiceImpl {
         }
         return dateList;
     }
+
     /**
      * 获取文章贡献度
+     *
      * @return
      */
     public Map<String, Object> contribute() {
@@ -238,35 +247,45 @@ public class HomeServiceImpl {
 
     /**
      * 分类统计
+     *
      * @return
      */
-    public Map<String, Object> categoryCount(){
+    public Map<String, Object> categoryCount() {
         Map<String, Object> map = new HashMap<>();
         List<CategoryCountVO> result = categoryMapper.countArticle();
         List<String> list = new ArrayList<>();
         result.forEach(item -> list.add(item.getName()));
-        map.put("result",result);
-        map.put("categoryList",list);
+        map.put("result", result);
+        map.put("categoryList", list);
         return map;
     }
 
     /**
      * 获取用户访问数据
+     *
      * @return
      */
-    public List<Map<String,Object>> userAccess() {
+    public List<Map<String, Object>> userAccess() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) - 7);
-        List<Map<String,Object>> userAccess = sysLogMapper.getUserAccess(DateUtils.formateDate(calendar.getTime(), DateUtils.YYYY_MM_DD));
+        List<Map<String, Object>> userAccess = sysLogMapper.getUserAccess(DateUtils.formateDate(calendar.getTime(), DateUtils.YYYY_MM_DD));
         return userAccess;
     }
 
     /**
      * 获取网站访问量
+     *
      * @return
      */
-    private Object getViewsCount() {
-        Object count = redisService.getCacheObject(RedisConstants.BLOG_VIEWS_COUNT);
+    private Object getBrowseCountCount() {
+        Object count = redisService.getCacheObject(RedisConstants.WEBSITE_BROWSE_COUNT);
+        Object viewsCount = Optional.ofNullable(count).orElse(0);
+        return viewsCount;
+    }
+
+
+    private Object getUserCountCount() {
+        Object count = redisService.getCacheObject(RedisConstants.WEBSITE_USER_COUNT);
         Object viewsCount = Optional.ofNullable(count).orElse(0);
         return viewsCount;
     }

@@ -103,10 +103,10 @@ export default {
         this.$store.state.loginFlag = false;
         this.$store.commit("login", res.data);
         setToken(res.data.token)
-        this.$message.success("登录成功");
+        this.$toast({ type: "success", message: '登录成功' });
         this.$router.go(0);
       }).catch(err => {
-        this.$message.error(err.message);
+        this.$toast({ type: "error", message: err.message });
       });
     },
     qqLogin() {

@@ -18,6 +18,7 @@
 *.iml
 *.ipr
 workspace.xml
+/*/target/*
 
 ### NetBeans ###
 /nbproject/private/
@@ -26,6 +27,7 @@ workspace.xml
 /dist/
 /nbdist/
 /.nb-gradle/
+/*/dist/*
 
 
 .DS_Store

@@ -46,9 +46,10 @@ import FeedBack from "./components/FeedBack";
 import { getWebSiteInfo, report } from "./api";
 export default {
   mounted() {
-    this.getBlogInfo();
     // 上传访客信息
     report();
+
+    this.getBlogInfo();
   },
   components: {
     TopNavBar,

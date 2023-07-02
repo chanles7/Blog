@@ -15,21 +15,15 @@ import com.java.enums.PublishEnum;
 import com.java.enums.SearchModelEnum;
 import com.java.enums.YesOrNoEnum;
 import com.java.exception.BusinessException;
-import com.java.common.*;
-import com.java.entity.*;
 import com.java.mapper.ArticleMapper;
 import com.java.mapper.CategoryMapper;
 import com.java.mapper.CommentMapper;
 import com.java.mapper.TagsMapper;
 import com.java.service.ArticleService;
 import com.java.service.RedisService;
-import com.java.service.SystemConfigService;
-import com.java.util.BeanCopyUtils;
-import com.java.util.ElasticsearchUtil;
-import com.java.util.IpUtils;
-import com.java.util.PageUtils;
-import com.java.vo.*;
 import com.java.strategy.context.SearchStrategyContext;
+import com.java.util.*;
+import com.java.vo.*;
 import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import lombok.RequiredArgsConstructor;
@@ -84,6 +78,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, BlogArticle> 
     @Value("${baidu.url}")
     private String baiduUrl;
 
+    private final UserHolder userHolder;
+
 
     /**
      * 后台获取所有文章
@@ -125,6 +121,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, BlogArticle> 
 
         blogArticle.setCategoryId(categoryId);
 
+        blogArticle.setContent(SensitiveFilterUtil.filter(blogArticle.getContent()));
+        blogArticle.setContentMd(SensitiveFilterUtil.filter(blogArticle.getContentMd()));
+
         int insert = baseMapper.insert(blogArticle);
         if (insert > 0) {
             tagsMapper.saveArticleTags(blogArticle.getId(), tagList);
@@ -152,7 +151,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, BlogArticle> 
 
         blogArticle = BeanCopyUtils.copyObject(article, BlogArticle.class);
         blogArticle.setCategoryId(categoryId);
-        blogArticle.setUserId(StpUtil.getLoginIdAsLong());
+        blogArticle.setUserId(userHolder.getCurrentUid());
+
+        blogArticle.setContent(SensitiveFilterUtil.filter(blogArticle.getContent()));
+        blogArticle.setContentMd(SensitiveFilterUtil.filter(blogArticle.getContentMd()));
+
         baseMapper.updateById(blogArticle);
 
         //先删出所有标签
@@ -310,8 +313,19 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, BlogArticle> 
      * @return
      */
     @Override
-    public ResponseResult listWebArticle() {
-        Page<ArticlePreviewVO> articlePreviewDTOPage = baseMapper.selectPreviewPage(new Page<>(PageUtils.getPageNo(), PageUtils.getPageSize()), PublishEnum.PUBLISH.code, null, null);
+    public ResponseResult listWebArticle(String strategy) {
+        Page<ArticlePreviewVO> articlePreviewDTOPage = null;
+        Page<Object> page = new Page<>(PageUtils.getPageNo(), PageUtils.getPageSize());
+        switch (strategy) {
+            case "all":
+                articlePreviewDTOPage = baseMapper.selectPreviewPage(page, PublishEnum.PUBLISH.code, null, null, null);
+                break;
+            case "look":
+                User currentUser = userHolder.getCurrentUser();
+                articlePreviewDTOPage = baseMapper.selectPreviewPage(page, PublishEnum.PUBLISH.code, currentUser.getId(), null, null);
+                break;
+        }
+        assert articlePreviewDTOPage != null;
         articlePreviewDTOPage.getRecords().forEach(item -> item.setTagVOList(tagsMapper.findByArticleIdToTags(item.getId())));
         return ResponseResult.success(articlePreviewDTOPage);
     }
@@ -374,7 +388,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, BlogArticle> 
     @Override
     public ResponseResult condition(Long categoryId, Long tagId, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
-        Page<ArticlePreviewVO> blogArticlePage = baseMapper.selectPreviewPage(new Page<>(PageUtils.getPageNo(), pageSize), PublishEnum.PUBLISH.getCode(), categoryId, tagId);
+        User currentUser = userHolder.getCurrentUser();
+        Page<ArticlePreviewVO> blogArticlePage = baseMapper.selectPreviewPage(new Page<>(PageUtils.getPageNo(), pageSize), PublishEnum.PUBLISH.getCode(), currentUser.getId(), categoryId, tagId);
         blogArticlePage.getRecords().forEach(item -> {
             List<TagVO> tagList = tagsMapper.findByArticleIdToTags(item.getId());
             item.setTagVOList(tagList);
@@ -398,7 +413,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, BlogArticle> 
      */
     @Override
     public ResponseResult archive() {
-        Page<ArticlePreviewVO> articlePage = baseMapper.selectArchivePage(new Page<>(PageUtils.getPageNo(), PageUtils.getPageSize()), PublishEnum.PUBLISH.code);
+        Long uid = userHolder.getCurrentUid();
+        Page<ArticlePreviewVO> articlePage = baseMapper.selectArchivePage(new Page<>(PageUtils.getPageNo(), PageUtils.getPageSize()), PublishEnum.PUBLISH.code, uid);
         return ResponseResult.success(articlePage);
     }
 
@@ -412,13 +428,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, BlogArticle> 
         if (StringUtils.isBlank(keywords)) {
             throw new BusinessException(ResultCode.PARAMS_ILLEGAL.getDesc());
         }
-        //获取搜索模式（es搜索或mysql搜索）
-//        SystemConfig systemConfig = systemConfigService.getCustomizeOne();
-//        String strategy = SearchModelEnum.getStrategy(systemConfig.getSearchModel());
-        //搜索逻辑
-//        List<ArticleSearchVO> articleSearchVOS = searchStrategyContext.executeSearchStrategy(strategy, keywords);
-//        return ResponseResult.success(articleSearchVOS);
-        return ResponseResult.success();
+
+        String strategy = SearchModelEnum.getStrategy(0);
+        List<ArticleSearchVO> articleSearchVOS = searchStrategyContext.executeSearchStrategy(strategy, keywords);
+        return ResponseResult.success(articleSearchVOS);
     }
 
     /**

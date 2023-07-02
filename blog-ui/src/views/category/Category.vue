@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { getCategory } from "../../api";
+import { getCategory } from "@/api";
 export default {
   metaInfo: {
     meta: [

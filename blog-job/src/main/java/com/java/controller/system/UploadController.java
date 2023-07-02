@@ -29,7 +29,7 @@ public class UploadController {
     }
 
     @RequestMapping(value = "/upload",method = RequestMethod.POST)
-    @SaCheckPermission("/file/upload")
+//    @SaCheckPermission("/file/upload")
     @ApiOperation(value = "上传图片",httpMethod = "POST", response = ResponseResult.class, notes = "上传图片")
     public ResponseResult upload(MultipartFile multipartFile){
         return cloudOssService.upload(multipartFile);

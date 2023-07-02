@@ -1,17 +1,12 @@
 package com.java.aspect;
 
-import cn.dev33.satoken.stp.StpUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.java.annotation.OperationLogger;
+import com.java.mapper.AdminLogMapper;
+import com.java.mapper.ExceptionLogMapper;
 import com.java.util.AspectUtils;
 import com.java.util.DateUtils;
 import com.java.util.IpUtils;
-import com.java.vo.SystemUserVO;
-import com.java.annotation.OperationLogger;
-import com.java.entity.ExceptionLog;
-import com.java.entity.AdminLog;
-import com.java.mapper.ExceptionLogMapper;
-import com.java.mapper.AdminLogMapper;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -31,8 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.HashMap;
-
-import static com.java.common.Constants.CURRENT_USER;
 
 /**
  * 日志切面
@@ -91,13 +84,13 @@ public class OperationLoggerAspect {
         String operationName = AspectUtils.INSTANCE.parseParams(joinPoint.getArgs(), operationLogger.value());
         // 获取参数名称字符串
         String paramsJson = getParamsJson((ProceedingJoinPoint) joinPoint);
-        SystemUserVO user = (SystemUserVO) StpUtil.getSession().get(CURRENT_USER);
-
-        ExceptionLog exception = ExceptionLog.builder().ip(ip).ipSource(IpUtils.getCityInfo(ip))
-                .params(paramsJson).username(user.getUsername()).method(joinPoint.getSignature().getName())
-                .exceptionJson(JSON.toJSONString(e)).exceptionMessage(e.getMessage()).operation(operationName)
-                .createTime(DateUtils.getNowDate()).build();
-        exceptionLogMapper.insert(exception);
+//        SystemUserVO user = (SystemUserVO) StpUtil.getSession().get(CURRENT_USER);
+//
+//        ExceptionLog exception = ExceptionLog.builder().ip(ip).ipSource(IpUtils.getCityInfo(ip))
+//                .params(paramsJson).username(user.getUsername()).method(joinPoint.getSignature().getName())
+//                .exceptionJson(JSON.toJSONString(e)).exceptionMessage(e.getMessage()).operation(operationName)
+//                .createTime(DateUtils.getNowDate()).build();
+//        exceptionLogMapper.insert(exception);
     }
 
     /**
@@ -123,7 +116,7 @@ public class OperationLoggerAspect {
         String paramsJson = getParamsJson(point);
 
         // 当前操作用户
-        SystemUserVO user = (SystemUserVO) StpUtil.getSession().get(CURRENT_USER);
+//        SystemUserVO user = (SystemUserVO) StpUtil.getSession().get(CURRENT_USER);
         String type = request.getMethod();
         String ip = IpUtils.getIp(request);
         String url = request.getRequestURI();
@@ -131,10 +124,10 @@ public class OperationLoggerAspect {
         // 存储日志
         Date endTime = new Date();
         Long spendTime = endTime.getTime() - startTime.getTime();
-        AdminLog adminLog = new AdminLog(ip, IpUtils.getCityInfo(ip), type, url, user.getNickname(),
-                paramsJson, point.getTarget().getClass().getName(),
-                point.getSignature().getName(), operationName, spendTime);
-        adminLogMapper.insert(adminLog);
+//        AdminLog adminLog = new AdminLog(ip, IpUtils.getCityInfo(ip), type, url, user.getNickname(),
+//                paramsJson, point.getTarget().getClass().getName(),
+//                point.getSignature().getName(), operationName, spendTime);
+//        adminLogMapper.insert(adminLog);
     }
 
     private String getParamsJson(ProceedingJoinPoint joinPoint) throws ClassNotFoundException, NoSuchMethodException {

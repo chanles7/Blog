@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog :close-on-click-modal="false" :show-close="false" width="40%" title="反馈" :visible.sync="this.$store.state.dialogFormVisible">
+    <el-dialog :close-on-click-modal="false" :show-close="false" :width="width" title="反馈" :visible.sync="this.$store.state.dialogFormVisible">
       <el-form :rules="rules" ref="dataForm" label-position="left" :model="form">
         <el-form-item label="反馈类型" prop="type">
           <el-radio v-model="form.type" :label="1">给 {{blogInfo.webSite.author}} 提交需求</el-radio>
@@ -29,22 +29,15 @@
 </template>
 
 <script>
-import { addFeedback } from "../api";
+import { addFeedback } from "@/api";
+import { judgeIsLargeWidth } from '@/utils/resize'
 export default {
-  metaInfo: {
-    meta: [
-      {
-        name: "keyWords",
-        content: "北极星,www.chales.online,博客,个人博客,开源博客", //变量或字符串
-      },
-      {
-        name: "description",
-        content:
-          "一个专注于技术分享的博客平台,大家以共同学习,乐于分享,拥抱开源的价值观进行学习交流",
-      },
-    ],
+  mounted() {
+    if (judgeIsLargeWidth()) {
+      this.width = "40%";
+    }
   },
-  data: function () {
+  data() {
     return {
       formLabelWidth: "80px",
       form: {
@@ -54,6 +47,7 @@ export default {
         content: null,
         imgUrl: null,
       },
+      width: "80%",
       img: process.env.VUE_APP_IMG_API,
       rules: {
         type: [{ required: true, message: "必填字段", trigger: "blur" }],

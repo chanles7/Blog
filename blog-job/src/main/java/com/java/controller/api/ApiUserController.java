@@ -1,7 +1,9 @@
 package com.java.controller.api;
 
 import com.java.common.ResponseResult;
-import com.java.dto.*;
+import com.java.dto.LoginDTO;
+import com.java.dto.RegisterDTO;
+import com.java.dto.UserInfoDTO;
 import com.java.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -53,6 +55,13 @@ public class ApiUserController {
     @ApiOperation(value = "续费token", httpMethod = "POST", response = ResponseResult.class, notes = "续费token")
     public ResponseResult tokenRecharge(HttpServletRequest request){
         return userService.tokenRecharge(request);
+    }
+
+
+    @PostMapping(value = "/update")
+    @ApiOperation(value = "更新用户信息", httpMethod = "POST", response = ResponseResult.class, notes = "更新用户信息")
+    public ResponseResult update(@RequestBody UserInfoDTO userInfoVO){
+        return userService.update(userInfoVO);
     }
 }
 

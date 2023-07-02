@@ -101,9 +101,10 @@ public interface ArticleService extends IService<BlogArticle> {
 
     /**
      * 首页分页获取文章
+     * @param strategy 策略
      * @return
      */
-    ResponseResult listWebArticle();
+    ResponseResult listWebArticle(String strategy);
 
     /**
      * 首页获取文章详情

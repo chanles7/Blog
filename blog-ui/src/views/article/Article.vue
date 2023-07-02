@@ -120,7 +120,7 @@
                 <img class="post-cover" :src="article.lastArticle.avatar" />
                 <div class="post-info">
                   <div class="label">上一篇</div>
-                  <div class="post-title">
+                  <div class="post-title article-title-overflow">
                     {{ article.lastArticle.title }}
                   </div>
                 </div>
@@ -132,7 +132,7 @@
                 <img class="post-cover" :src="article.nextArticle.avatar" />
                 <div class="post-info" style="text-align: right">
                   <div class="label">下一篇</div>
-                  <div class="post-title">
+                  <div class="post-title article-title-overflow">
                     {{ article.nextArticle.title }}
                   </div>
                 </div>
@@ -154,7 +154,7 @@
                       <i class="iconfont iconrili" />
                       {{ item.createTime | date }}
                     </div>
-                    <div>{{ item.title }}</div>
+                    <div class="article-title-overflow">{{ item.title }}</div>
                   </div>
                 </router-link>
               </div>
@@ -186,11 +186,11 @@
             <div class="article-list">
               <div class="article-item" v-for="item of article.newestArticleList" :key="item.id">
                 <router-link :to="'/articles/' + item.id" class="content-cover">
-                  <img :src="item.avatar" />
+                  <img :src="item.authorAvatar" />
                 </router-link>
                 <div class="content">
                   <div class="content-title">
-                    <router-link :to="'/articles/' + item.id">
+                    <router-link :to="'/articles/' + item.id" class="article-title-overflow">
                       {{ item.title }}
                     </router-link>
                   </div>
@@ -229,19 +229,6 @@ import tocbot from "tocbot";
 import { getArticleInfo, fetchComments, like, checkSecret } from "../../api";
 
 export default {
-  metaInfo: {
-    meta: [
-      {
-        name: "keyWords",
-        content: "北极星,开源博客,www.chales.online", //变量或字符串
-      },
-      {
-        name: "description",
-        content:
-          "一个专注于技术分享的博客平台,大家以共同学习,乐于分享,拥抱开源的价值观进行学习交流",
-      },
-    ],
-  },
   components: {
     Comment,
   },
@@ -308,7 +295,6 @@ export default {
       const that = this;
       //查询文章
       getArticleInfo(this.articleId).then((res) => {
-        document.title = res.data.title;
         if (res.data.keywords != null) {
           document
             .querySelector('meta[name="keywords"]')
@@ -827,7 +813,7 @@ export default {
 }
 
 .post-title {
-  font-weight: 500;
+  font-weight: 90%;
   color: #fff;
 }
 

@@ -9,16 +9,12 @@
       </div>
       <v-row class="info-wrapper">
         <v-col md="3" cols="12">
-          <!--          <button id="pick-avatar">
+          <!-- <button id="pick-avatar">
             <v-avatar size="140">
               <img :src="this.$store.state.avatar" />
             </v-avatar>
           </button>
-          <avatar-cropper
-            @uploaded="uploadAvatar"
-            trigger="#pick-avatar"
-            upload-url="http://localhost:8800/shiyi/user/updateAvatar"
-          />-->
+          <avatar-cropper @uploaded="uploadAvatar" trigger="#pick-avatar" upload-url="http://localhost:8800/shiyi/user/updateAvatar" /> -->
           <el-upload class="avatar-uploader" :show-file-list="false" ref="upload" name="filedatas" :action="uploadPictureHost" :before-upload="uploadBefore" :http-request="uploadSectionFile" multiple>
             <img style="border-radius: 50%;width: 120px;" v-if="this.$store.state.avatar" :src="this.$store.state.avatar" class="imgAvatar">
             <i v-else class="el-icon-plus avatar-img-icon"></i>
@@ -45,48 +41,43 @@
 </template>
 
 <script>
-import { updateUser, upload } from "../../api";
+import { upload } from "@/api";
+import { getUserInfo, updateUserInfo } from '@/api/user'
 import AvatarCropper from "vue-avatar-cropper";
 export default {
-  metaInfo: {
-    meta: [
-      {
-        name: "keyWords",
-        content: "北极星,开源博客,www.chales.online", //变量或字符串
-      },
-      {
-        name: "description",
-        content:
-          "一个专注于技术分享的博客平台,大家以共同学习,乐于分享,拥抱开源的价值观进行学习交流",
-      },
-    ],
+  mounted() {
+    this.getUserInfo()
   },
   components: { AvatarCropper },
-  data: function () {
+  data() {
     return {
       uploadPictureHost: process.env.VUE_APP_BASE_API + "/file/upload",
       // 加载层信息
       loading: [],
       files: {},
       userInfo: {
-        nickname: this.$store.state.nickname,
-        intro: this.$store.state.intro,
-        avatar: this.$store.state.avatar,
-        webSite: this.$store.state.webSite,
+        nickname: "",
+        intro: "",
+        avatar: "",
+        webSite: "",
       },
     };
   },
   methods: {
+    getUserInfo() {
+      getUserInfo().then(res => {
+        this.userInfo = res.data
+      })
+    },
     updateUserInfo() {
-      (this.userInfo.avatar = this.$store.state.avatar),
-        updateUser(this.userInfo)
-          .then((res) => {
-            this.$store.commit("updateUserInfo", this.userInfo);
-            this.$toast({ type: "success", message: "修改成功" });
-          })
-          .catch((err) => {
-            this.$toast({ type: "error", message: err.message });
-          });
+      updateUserInfo(this.userInfo)
+        .then((res) => {
+          this.$toast({ type: "success", message: "修改成功" });
+          this.getUserInfo()
+        })
+        .catch((err) => {
+          this.$toast({ type: "error", message: err.message });
+        });
     },
     uploadBefore: function () {
       this.openLoading();

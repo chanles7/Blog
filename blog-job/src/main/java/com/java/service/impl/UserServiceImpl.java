@@ -11,16 +11,14 @@ import com.java.config.satoken.MySaTokenListener;
 import com.java.config.satoken.OnlineUser;
 import com.java.dto.LoginDTO;
 import com.java.dto.RegisterDTO;
+import com.java.dto.UserInfoDTO;
 import com.java.entity.BlogArticle;
+import com.java.entity.Category;
 import com.java.entity.Menu;
 import com.java.entity.User;
 import com.java.enums.UserStatusEnum;
-import com.java.exception.BusinessException;
 import com.java.mapper.UserMapper;
-import com.java.service.ArticleService;
-import com.java.service.MenuService;
-import com.java.service.RedisService;
-import com.java.service.UserService;
+import com.java.service.*;
 import com.java.util.AesEncryptUtils;
 import com.java.util.PageUtils;
 import com.java.util.UserHolder;
@@ -37,7 +35,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -59,6 +59,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private final UserHolder userHolder;
 
     private final ArticleService articleService;
+
+    private final CategoryService categoryService;
+
+    private final WebConfigService webConfigService;
 
     /**
      * 用户列表
@@ -240,8 +244,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user = User.builder()
                 .username(username)
                 .password(AesEncryptUtils.aesEncrypt(password))
-                .nickname("游客")
-                .avatar("https://www.baidu.com/link?url=SYzo9q27qIzX4Kei7JUffQJ8g5HSno46J0rvaTd4bfG6x4VVAVuGsZXonSXisPC7vbuUu45JaP8qrnhkDGCPQ3pdEh7iu8VCsl1yKd_YHChsYSUWrsdgxvdIWC-W5tOB8h32P0Hg1JNT6SVYmzgLl8_9fFMFo9Z9_efNxKNVFUqyAUMFwis3ry43m4gPlKmzGxuWdCUl4MreDu_SGCtbKm5TtfV_kGKolHVfjiDHTFjHH7VtXK97pY7qIMsdEIj9g879Fenb-fHvll4VfO6rMhAs4PvoaSSPphpbdhL-4Wq_n3AZSPvcWwSHbl7aObb4rMKW_cdfhAfdGs1qxjdFVJvR8gWE8NEyjqmkElHuKhtT8xqhX-a7RRXuv4JIZX7MLlI4Ov0zqnMDRePrB1toHSuxGTAHgAc7gaepN7uEuMjeYBXlS15YCTsnscBdoWtwVy8Z9qqRkOYYifN5UvhJ-GceT1rsYujMVeR5n_Yu3wTy7xDKf78NOTzT-Q2znoGuFJ1sSLQpzt4csWivLxEcdiFkwxYzlrTie43-G7eOqYOdMTQoic9Z_wan4IvvusLg2uhzHbxo7ORBOyRodNyT6XNq1h_fTuN3LgZwEbROKWWnYlJofvodQ3FRkdOYTW7_DW7NEUztdxa4-PofoROHA-UD3MLnyAWdoA4ptiQuhTIWAsyfJQPRIB4cdmXf-jRA&wd=&eqid=a8ce5bc00005c4b3000000036474a4c6")
+                .nickname("游客" + System.currentTimeMillis())
+                .avatar(webConfigService.query().list().get(0).getTouristAvatar())
                 .build();
         boolean insert = this.save(user);
 
@@ -254,17 +258,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String username = loginDTO.getUsername();
         User user = this.query().eq("username", username).one();
         if (user == null) {
-            throw new BusinessException(ResultCode.ERROR_MUST_REGISTER.desc);
+            return ResponseResult.error(ResultCode.ERROR_MUST_REGISTER.desc);
         }
         boolean validate = AesEncryptUtils.validate(user.getPassword(), loginDTO.getPassword());
         Assert.isTrue(validate, ResultCode.ERROR_PASSWORD.getDesc());
 
         //登录
-        StpUtil.login(user.getId().longValue());
+        StpUtil.login(user.getId());
         String token = StpUtil.getTokenValue();
         logger.info("token:{}", token);
 
-        redisService.setCacheObject(RedisConstants.USER_TOKEN + token, user.getId(), 30, TimeUnit.MINUTES);
+        redisService.setCacheObject(RedisConstants.USER_TOKEN + token, user.getId(), 7, TimeUnit.DAYS);
 
         //组装数据
         UserInfoVO userInfoVO = UserInfoVO.builder()
@@ -299,11 +303,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             blogCount++;
             blogViews += blog.getQuantity();
         }
+        List<Category> categories = categoryService.listByUid(uid);
         return UserInfoVO.builder()
                 .avatar(user.getAvatar())
                 .nickname(user.getNickname())
                 .blogCount(blogCount)
                 .blogViews(blogViews)
+                .categoryCount(categories.size())
                 .build();
     }
 
@@ -317,5 +323,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String token = request.getHeader("X-Token");
         redisService.setCacheObject(RedisConstants.USER_TOKEN + token, currentUser.getId(), 30, TimeUnit.MINUTES);
         return ResponseResult.success();
+    }
+
+
+    @Override
+    public ResponseResult update(UserInfoDTO userInfoVO) {
+        boolean update = this.update().eq("id", userHolder.getCurrentUid())
+                .set("nickname", userInfoVO.getNickname())
+                .set("avatar", userInfoVO.getAvatar())
+                .update();
+        return update ? ResponseResult.success() : ResponseResult.error();
     }
 }

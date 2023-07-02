@@ -16,9 +16,9 @@
       <!-- 对话内容 -->
       <div class="message" id="message">
         <!-- 录音遮罩层 -->
-        <div v-show="voiceActive" class="voice" @mousemove.prevent.stop="translationmove($event)" @mouseup.prevent.stop="translationEnd($event)">
+        <!-- <div v-show="voiceActive" class="voice" @mousemove.prevent.stop="translationmove($event)" @mouseup.prevent.stop="translationEnd($event)">
           <v-icon ref="voiceClose" class="close-voice">mdi-close</v-icon>
-        </div>
+        </div> -->
         <div :class="isMyMessage(item)" v-for="(item, index) of chatRecordList" :key="index">
           <!-- 头像 -->
           <img :src="item.avatar" :class="isleft(item)" />
@@ -69,9 +69,9 @@
         <!-- 文字输入 -->
         <textarea v-show="!isVoice" ref="chatInput" v-model="content" @keydown.enter="saveMessage($event)" placeholder="请输入内容" />
         <!-- 语音输入 -->
-        <button class="voice-btn" v-show="isVoice" @mousedown.prevent.stop="translationStart" @mouseup.prevent.stop="translationEnd($event)" @touchstart.prevent.stop="translationStart" @touchend.prevent.stop="translationEnd($event)" @touchmove.prevent.stop="translationmove($event)">
+        <!-- <button class="voice-btn" v-show="isVoice" @mousedown.prevent.stop="translationStart" @mouseup.prevent.stop="translationEnd($event)" @touchstart.prevent.stop="translationStart" @touchend.prevent.stop="translationEnd($event)" @touchmove.prevent.stop="translationmove($event)">
           按住说话
-        </button>
+        </button> -->
         <!-- 表情 -->
         <i class="iconfont iconbiaoqing emoji" :style="isEmoji ? 'color:#FFC83D' : ''" @click.prevent.stop="openEmoji" />
         <!-- 发送按钮 -->
@@ -321,7 +321,7 @@ export default {
       };
       this.axios(options);
     },
-    translationmove() { },
+    // translationmove() { },
     // 播放语音
     playVoice(item) {
       var player = this.$refs.voices[this.voiceList.indexOf(item.id)];

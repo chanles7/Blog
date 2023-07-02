@@ -73,4 +73,8 @@ public interface CategoryService extends IService<Category> {
      */
     ResponseResult webList();
 
+
+
+    List<Category> listByUid(Long uid);
+
 }

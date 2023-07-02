@@ -36,7 +36,7 @@ public class ArticlesController {
     @PostMapping(value = "/add")
 //    @SaCheckPermission("/system/article/add")
     @ApiOperation(value = "保存文章", httpMethod = "POST", response = ResponseResult.class, notes = "保存文章")
-    @OperationLogger(value = "保存文章")
+//    @OperationLogger(value = "保存文章")
     public ResponseResult insert(@RequestBody ArticleDTO article) {
         return  articleService.insertArticle(article);
     }
@@ -44,7 +44,7 @@ public class ArticlesController {
     @PostMapping(value = "/update")
 //    @SaCheckPermission("/system/article/update")
     @ApiOperation(value = "修改文章", httpMethod = "POST", response = ResponseResult.class, notes = "修改文章")
-    @OperationLogger(value = "修改文章")
+//    @OperationLogger(value = "修改文章")
     public ResponseResult update(@RequestBody ArticleDTO article) {
         return articleService.updateArticle(article);
     }

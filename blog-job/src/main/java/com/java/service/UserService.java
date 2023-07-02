@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.java.common.ResponseResult;
 import com.java.dto.LoginDTO;
 import com.java.dto.RegisterDTO;
+import com.java.dto.UserInfoDTO;
 import com.java.entity.User;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,4 +47,6 @@ public interface UserService extends IService<User> {
     ResponseResult getAuthorInfo();
 
     ResponseResult tokenRecharge(HttpServletRequest request);
+
+    ResponseResult update(UserInfoDTO userInfoVO);
 }

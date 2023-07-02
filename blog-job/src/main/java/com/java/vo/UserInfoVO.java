@@ -55,6 +55,11 @@ public class UserInfoVO {
     private Integer blogViews;
 
     /**
+     * 目录数量
+     */
+    private Integer categoryCount;
+
+    /**
      * 点赞文章集合
      */
     private Set<Object> articleLikeSet;

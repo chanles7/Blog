@@ -11,15 +11,6 @@
         <div class="blog-intro">
           {{ blogInfo.webSite.summary }} <span class="typed-cursor">|</span>
         </div>
-        <!-- 联系方式 -->
-        <div class="blog-contact">
-          <a v-if="isShowSocial(2)" class="mr-5 iconfont iconqq" target="_blank" :href="'http://wpa.qq.com/msgrd?v=3&uin=' +
-            blogInfo.webSite.qqNumber +
-            '&site=qq&menu=yes'
-            " />
-          <a v-if="isShowSocial(3)" target="_blank" :href="blogInfo.webSite.github" class="mr-5 iconfont icongithub" />
-          <a v-if="isShowSocial(4)" target="_blank" :href="blogInfo.webSite.gitee" class="iconfont icongitee-fill-round" />
-        </div>
       </div>
       <!-- 向下滚动 -->
       <div class="scroll-down" @click="scrollDown">
@@ -37,7 +28,7 @@
           <v-card class="blog-card animated zoomIn mt-5">
             <div id="he-plugin-standard"></div>
           </v-card>
-          <!-- 网站信息 -->
+          <!-- 标签信息 -->
           <v-card class="blog-card animated zoomIn mt-5">
             <div class="web-info-title">
               <svg t="1683877542991" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7105" width="16" height="16">
@@ -67,8 +58,13 @@
                 运行时间:<span class="float-right">{{ time }}</span>
               </div>
               <div style="padding:4px 0 0">
-                总访问量:<span class="float-right">
-                  {{ blogInfo.count.viewsCount }}
+                网站访问量:<span class="float-right">
+                  {{ blogInfo.count.browseCount }}
+                </span>
+              </div>
+              <div style="padding:4px 0 0">
+                用户访问量:<span class="float-right">
+                  {{ blogInfo.count.userCount }}
                 </span>
               </div>
               <div style="padding:4px 0 0">
@@ -88,11 +84,15 @@
           </div>
         </v-card>
         <v-card class="animated zoomIn article-card" style="border-radius: 12px 8px 8px 12px" v-for="(item, index) of articleList" :key="item.id">
+          <div class="article-card-author">
+            <el-avatar shape="square" :size="avatarSize" :src="item.authorAvatar"></el-avatar>
+            <a style="color: #025a06">{{item.authorName}}</a>
+          </div>
           <!-- 文章信息 -->
           <div class="article-wrapper">
             <div style="line-height:1.4">
               <div>
-                <router-link :to="'/articles/' + item.id" style="color: blue">
+                <router-link :to="'/articles/' + item.id" class="article-title-overflow" style="color: #26c2e9">
                   {{ item.title }}
                 </router-link>
                 <span v-if="item.quantity >= 1000 && item.quantity < 10000" style="font-size:12px;border-radius:3px;border: 1px solid  #f70;text-align: center">
@@ -103,7 +103,7 @@
                 </span>
               </div>
             </div>
-            <div class="article-info">
+            <div class="article-info article-tag-overflow">
               <!-- 发表时间 -->
               <v-icon size="14">mdi-calendar-month-outline</v-icon>
               {{ item.createTime | date }}
@@ -115,31 +115,20 @@
               </router-link>
               <span class="separator">|</span>
               <!-- 文章标签 -->
-              <router-link style="display:inline-block" :to="'/tags/' + tag.id" class="mr-1" v-for="tag of item.tagDTOList" :key="tag.id">
+              <router-link style="display:inline-block" :to="'/tags/' + tag.id" class="mr-1" v-for="tag of item.tagVOList" :key="tag.id">
                 <v-icon size="14">mdi-tag-multiple</v-icon>
                 {{ tag.name }}
               </router-link>
             </div>
 
             <!-- 文章内容 -->
-            <div class="article-content">
+            <router-link :to="'/articles/' + item.id" class="article-content-overflow">
               {{ item.content }}
-            </div>
-            <el-row>
-              <el-col :md="2" :cols="12">
-                <!-- <el-avatar :size="80" src="https://empty" @error="errorHandler">
-                  <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
-                </el-avatar> -->
-                1
-              </el-col>
-              <el-col :md="10" :cols="12">
-                sad
-              </el-col>
-            </el-row>
+            </router-link>
           </div>
         </v-card>
 
-        <div style="text-align: center;margin-top: 20px">
+        <div class="pagination">
           <el-pagination background @current-change="handleCurrentChange" :current-page="params.pageNo" :page-size="params.pageSize" layout="total, prev, pager, next, jumper" :total="params.total" />
         </div>
 
@@ -155,7 +144,7 @@
 <script>
 import EasyTyper from "easy-typer-js";
 import { fetchList, addFeedback, getTags } from "../../api";
-
+import { judgeIsLargeWidth } from '@/utils/resize'
 export default {
   created() {
     this.init();
@@ -176,7 +165,6 @@ export default {
         tags.push(tag);
       }
     });
-
     this.tags = tags;
   },
   destroyed() {
@@ -186,7 +174,8 @@ export default {
   beforeDestroy() {
     clearInterval(this.heartBeat);
   },
-  mounted: function () {
+  mounted() {
+    this.updateAvatarSize()
     setInterval(() => {
       this.rotateX(this.speedX);
       this.rotateY(this.speedY);
@@ -235,6 +224,7 @@ export default {
       tip: false,
       totalPage: null,
       img: process.env.VUE_APP_IMG_API,
+      avatarSize: 50,
       time: "",
       obj: {
         output: "",
@@ -248,6 +238,7 @@ export default {
       },
       articleList: [],
       params: {
+        strategy: 'all',
         pageNo: 1,
         pageSize: 8,
         total: 0
@@ -426,6 +417,12 @@ export default {
     handleCurrentChange(pageNo) {
       this.params.pageNo = pageNo
       this.getBlogList()
+    },
+    updateAvatarSize() {
+      // 根据屏幕宽度设置头像尺寸
+      if (judgeIsLargeWidth()) {
+        this.avatarSize = 75;
+      }
     }
   },
   computed: {
@@ -531,7 +528,23 @@ export default {
 }
 
 .article-wrapper {
-  font-size: 14px;
+  vertical-align: top;
+}
+
+.article-card-author {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  top: 0;
+  left: 0;
+}
+
+.article-card-author a {
+  padding-left: 1rem;
+}
+
+.pagination {
+  text-align: center;
 }
 
 @media (min-width: 760px) {
@@ -554,6 +567,7 @@ export default {
   }
 
   .article-card {
+    position: relative;
     display: flex;
     align-items: center;
     height: 280px;
@@ -576,12 +590,16 @@ export default {
   }
 
   .article-wrapper {
-    padding: 0 2.5rem;
+    padding: 3rem 2.5rem 0;
   }
 
   .article-wrapper a {
-    font-size: 1.5rem;
+    font-size: 1rem;
     transition: all 0.3s;
+  }
+
+  .pagination {
+    margin-top: 20px;
   }
 }
 
@@ -601,7 +619,12 @@ export default {
   }
 
   .article-card {
-    margin-top: 1rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 240px;
+    width: 100%;
+    margin-top: 5px;
   }
 
   .article-cover {
@@ -615,12 +638,17 @@ export default {
   }
 
   .article-wrapper {
-    padding: 1.25rem 1.25rem 1.875rem;
+    padding: 2rem 1rem 0;
+    width: 100%;
   }
 
   .article-wrapper a {
-    font-size: 1.25rem;
+    font-size: 0.8rem;
     transition: all 0.3s;
+  }
+
+  .pagination {
+    margin: 20px 0 10px 0;
   }
 }
 
@@ -649,15 +677,6 @@ export default {
 .article-info a {
   font-size: 95%;
   color: #858585 !important;
-}
-
-.article-content {
-  line-height: 2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
 }
 
 .blog-wrapper {

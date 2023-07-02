@@ -36,4 +36,10 @@ public class ArticlePreviewVO {
     @ApiModelProperty(value = "标签")
     private List<TagVO> tagVOList;
 
+    @ApiModelProperty(value = "作者名")
+    private String authorName;
+
+    @ApiModelProperty(value = "作者头像")
+    private String authorAvatar;
+
 }

@@ -71,8 +71,7 @@ public class RedisServiceImpl implements RedisService {
      * @return 缓存键值对应的数据
      */
     @Override
-    public Object getCacheObject(final String key)
-    {
+    public Object getCacheObject(final String key) {
         ValueOperations<String, Object> operation = redisTemplate.opsForValue();
         return operation.get(key);
     }

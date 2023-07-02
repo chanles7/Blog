@@ -38,7 +38,8 @@ public class CacheMonitorController {
         caches.add(new SysCacheVO(RedisConstants.CHECK_CODE_IP, "验证通过的ip",true));
         caches.add(new SysCacheVO(RedisConstants.UNIQUE_VISITOR, "访客",true));
         caches.add(new SysCacheVO(RedisConstants.VISITOR_AREA, "访客地区",true));
-        caches.add(new SysCacheVO(RedisConstants.BLOG_VIEWS_COUNT, "博客浏览量",true));
+        caches.add(new SysCacheVO(RedisConstants.WEBSITE_BROWSE_COUNT, "网站访问量",true));
+        caches.add(new SysCacheVO(RedisConstants.WEBSITE_USER_COUNT, "用户访问量",true));
         caches.add(new SysCacheVO(RedisConstants.ARTICLE_USER_LIKE, "用户点赞文章",true));
         caches.add(new SysCacheVO(RedisConstants.ARTICLE_LIKE_COUNT, "文章点赞量",true));
     }
